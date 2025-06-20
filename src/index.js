@@ -53,11 +53,13 @@ export class TransactionDurableObject {
 		return new Response('Not found', { status: 404 });
 	}
 
-	// only operation 1 happens, no rollback, no transaction
+	// this works as expecte, and it rolls back all writes
 	simulateAtomicFail(storage) {
-		storage.put('a', '1'); // this does not rollback
-		storage.put('b', Symbol('bad')); // this will crash the write
-		storage.put('c', '2'); // this never happens
+		this.storage.transaction(async (tx) => {
+			storage.put('a', '1'); // this rolls back
+			storage.put('b', Symbol('bad')); // this will crash the write
+			storage.put('c', '2'); // this never happens
+		});
 	}
 }
 export default {
