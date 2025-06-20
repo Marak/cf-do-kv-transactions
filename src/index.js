@@ -53,11 +53,11 @@ export class TransactionDurableObject {
 		return new Response('Not found', { status: 404 });
 	}
 
-	// both operations will succeed to write '1' and '2' to storage
+	// only operation 1 happens, no rollback, no transaction
 	simulateAtomicFail(storage) {
-		storage.put('a', '1');
-		storage.put('b', '2');
-		throw new Error('Simulated crash'); // still writes '1' and '2' to storage, this is not a transaction
+		storage.put('a', '1'); // this does not rollback
+		storage.put('b', Symbol('bad')); // this will crash the write
+		storage.put('c', '2'); // this never happens
 	}
 }
 export default {
